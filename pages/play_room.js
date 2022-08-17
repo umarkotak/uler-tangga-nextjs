@@ -42,28 +42,29 @@ export default function Home() {
   const [isWinner, setIsWinner] = useState(false)
 
   var confettiButton
-  if (typeof window !== "undefined") {
-    confettiButton = document.querySelector(".confetti-button")
-    confettiButton.addEventListener("click", () => confetti(confettiButton, {
-      angle: "75",
-      spread: "200",
-      startVelocity: "50",
-      elementCount: "40",
-      dragFriction: "0.09",
-      duration: "4000",
-      stagger: "3",
-      width: "10px",
-      height: "10px",
-      perspective: "500px",
-      colors: ["#a864fd", "#29cdff", "#78ff44", "#ff718d", "#fdff6a"]
-    }))
-  }
 
   useEffect(() => {
     if (!query || !query.id) { return }
 
+    if (typeof window !== "undefined") {
+      confettiButton = document.querySelector(".confetti-button")
+      confettiButton.addEventListener("click", () => confetti(confettiButton, {
+        angle: "75",
+        spread: "200",
+        startVelocity: "50",
+        elementCount: "40",
+        dragFriction: "0.09",
+        duration: "4000",
+        stagger: "3",
+        width: "10px",
+        height: "10px",
+        perspective: "500px",
+        colors: ["#a864fd", "#29cdff", "#78ff44", "#ff718d", "#fdff6a"]
+      }))
+    }
+
     var socketUrl = `ws://localhost:6001/uler_tangga/start?id=${query.id}&room_id=${query.room_id}`
-    socketUrl = `wss://uler-tangga-api.herokuapp.com/uler_tangga/start?id=${query.id}&room_id=${query.room_id}`
+    // var socketUrl = `wss://uler-tangga-api.herokuapp.com/uler_tangga/start?id=${query.id}&room_id=${query.room_id}`
     ws.current = new WebSocket(socketUrl)
     ws.current.onopen = () => {
       console.log("CONNECTION OPEN")
