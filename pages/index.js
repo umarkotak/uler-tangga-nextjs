@@ -24,13 +24,13 @@ export default function Home() {
 
         <div className="container mt-4 mx-auto backdrop-blur-sm max-w-[450px] bg-white bg-opacity-50 p-4 drop-shadow-lg rounded-xl text-center">
           <div className="mb-4 text-left">
-            <label className="block text-gray-700 text-sm font-bold mb-2" for="username">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
               Room ID
             </label>
             <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"  placeholder="jhon-room" value={roomId} onChange={(e) => {setRoomId(e.target.value)}} />
           </div>
           <div className="mb-4 text-left">
-            <label className="block text-gray-700 text-sm font-bold mb-2" for="username">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
               Username
             </label>
             <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"  placeholder="jhonedoe" value={userId} onChange={(e) => {setUserId(e.target.value)}} />
