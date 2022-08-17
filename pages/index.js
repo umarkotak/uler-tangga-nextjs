@@ -18,7 +18,7 @@ export default function Home() {
           )`
         }}
       >
-        <div className="container mt-16 mx-auto p-4 rounded-xl text-center">
+        <div className="container mt-8 mx-auto p-4 rounded-xl text-center">
           <span className="text-5xl font-bold font-sans drop-shadow-lg rounded-xl p-2 subpixel-antialiased text-[#071330]">ULAR TANGGA ONLINE</span>
         </div>
 
@@ -39,8 +39,8 @@ export default function Home() {
             <label className="block text-gray-700 text-sm font-bold mb-2">
               Map
             </label>
-            <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-              <option value="default" selected>Default</option>
+            <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" defaultValue="default">
+              <option value="default">Default</option>
             </select>
           </div>
 
@@ -51,9 +51,7 @@ export default function Home() {
           </div>
 
           <div className="flex items-center justify-between">
-            <Link href={`/play_room?id=${userId}&room_id=${roomId}`}>
-              <a className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Join Game</a>
-            </Link>
+            <a href={`/play_room?id=${userId}&room_id=${roomId}`} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Join Game</a>
             <a className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="#">
               Need help?
             </a>

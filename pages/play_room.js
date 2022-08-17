@@ -43,21 +43,27 @@ export default function Home() {
 
   var confettiButton
 
+  var onConnecting = false
   useEffect(() => {
     if (!query || !query.id) { return }
+
+    if (!query.room_id || !query.id) { return }
+
+    if (onConnecting) { return }
+    onConnecting = true
 
     if (typeof window !== "undefined") {
       confettiButton = document.querySelector(".confetti-button")
       confettiButton.addEventListener("click", () => confetti(confettiButton, {
-        angle: "75",
-        spread: "200",
+        angle: "60",
+        spread: "100",
         startVelocity: "50",
-        elementCount: "40",
+        elementCount: "50",
         dragFriction: "0.09",
         duration: "4000",
         stagger: "3",
-        width: "10px",
-        height: "10px",
+        width: "12px",
+        height: "12px",
         perspective: "500px",
         colors: ["#a864fd", "#29cdff", "#78ff44", "#ff718d", "#fdff6a"]
       }))
@@ -76,6 +82,8 @@ export default function Home() {
     return () => {
       ws.current.close()
     }
+
+    onConnecting = false
   // eslint-disable-next-line
   }, [query])
 
@@ -222,15 +230,17 @@ export default function Home() {
   // ===================================================================================== HANDLE UTILS FUNC END
 
   return (
-    <div>
+    <div className="bg-[#385E72] h-screen pt-4">
       <div className="container mx-auto">
-        <div>
-          <div className="grid grid-cols-10 gap-0">
-            {board.map_config.numbering.map((number, index) => (
-              <div className={`w-full ${fieldHeight} bg-[#EEF4ED] border p-[0px]`} key={index}>
-                <small className="leading-none ml-[5px]">{number}</small>
-              </div>
-            ))}
+        <div className="">
+          <div className="mx-1 rounded">
+            <div className="grid grid-cols-10 gap-0 rounded">
+              {board.map_config.numbering.map((number, index) => (
+                <div className={`w-[full] ${fieldHeight} bg-[#EEF4ED] border p-[0px] rounded`} key={index}>
+                  <span className="text-[10px] leading-none ml-[4px]">{number}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -305,11 +315,16 @@ export default function Home() {
             </div>
           </div>
         </div>
+        <div className="overflow-hidden">
+          <span className="confetti-button"></span>
+        </div>
       </div>
 
-      <div>
-        <div className="container mx-auto">
-          <span className="confetti-button"></span>
+      <div className="h-[200px]"></div>
+
+      <div className="z-10 fixed flex inset-x-0 w-full botttom-0">
+        <div className="bg-blue-100 block fixed inset-x-0 bottom-0 z-10">
+          <div></div>
           <div className="flex justify-between">
             <div className="p-2">
               <button className="btn border p-2 rounded mr-1" onClick={()=>handleSendRollNumber()}>PUTAR ANGKA</button>
@@ -333,6 +348,7 @@ export default function Home() {
               ></AnimatedNumbersNoSSR>
             </div>
           </div>
+          <div className="mb-6"></div>
         </div>
       </div>
 
