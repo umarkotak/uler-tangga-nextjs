@@ -249,13 +249,55 @@ export default function Home() {
           </div>
         </div>
 
-        <div className={`absolute w-full z-1 top-0 ${board.player_count >= 1 ? "block" : "hidden"}`}>
+        <div className={`absolute w-full z-1 top-0 ${board.player_count >= 2 ? "block" : "hidden"}`}>
           <div className="container mx-auto">
             <div className="grid grid-cols-10 gap-0" ref={parent_2}>
               {board.player_room_index_map["2"] && board.player_room_index_map["2"]["map_position"].map((field) => (
                 <div className={`w-full ${fieldHeight} p-[0px]`} key={field.index}>
                   <div className={classGenAvatarPosition(board.player_room_index_map["2"])}>
                     { field.is_here && <i className={classGenAvatar(board.player_room_index_map["2"])}></i> }
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className={`absolute w-full z-1 top-0 ${board.player_count >= 3 ? "block" : "hidden"}`}>
+          <div className="container mx-auto">
+            <div className="grid grid-cols-10 gap-0" ref={parent_3}>
+              {board.player_room_index_map["3"] && board.player_room_index_map["3"]["map_position"].map((field) => (
+                <div className={`w-full ${fieldHeight} p-[0px]`} key={field.index}>
+                  <div className={classGenAvatarPosition(board.player_room_index_map["3"])}>
+                    { field.is_here && <i className={classGenAvatar(board.player_room_index_map["3"])}></i> }
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className={`absolute w-full z-1 top-0 ${board.player_count >= 4 ? "block" : "hidden"}`}>
+          <div className="container mx-auto">
+            <div className="grid grid-cols-10 gap-0" ref={parent_4}>
+              {board.player_room_index_map["4"] && board.player_room_index_map["4"]["map_position"].map((field) => (
+                <div className={`w-full ${fieldHeight} p-[0px]`} key={field.index}>
+                  <div className={classGenAvatarPosition(board.player_room_index_map["4"])}>
+                    { field.is_here && <i className={classGenAvatar(board.player_room_index_map["4"])}></i> }
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className={`absolute w-full z-1 top-0 ${board.player_count >= 5 ? "block" : "hidden"}`}>
+          <div className="container mx-auto">
+            <div className="grid grid-cols-10 gap-0" ref={parent_5}>
+              {board.player_room_index_map["5"] && board.player_room_index_map["5"]["map_position"].map((field) => (
+                <div className={`w-full ${fieldHeight} p-[0px]`} key={field.index}>
+                  <div className={classGenAvatarPosition(board.player_room_index_map["5"])}>
+                    { field.is_here && <i className={classGenAvatar(board.player_room_index_map["5"])}></i> }
                   </div>
                 </div>
               ))}
