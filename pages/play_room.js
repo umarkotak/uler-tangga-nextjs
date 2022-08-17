@@ -70,7 +70,7 @@ export default function Home() {
     }
 
     var socketUrl = `ws://localhost:6001/uler_tangga/start?id=${query.id}&room_id=${query.room_id}`
-    // var socketUrl = `wss://uler-tangga-api.herokuapp.com/uler_tangga/start?id=${query.id}&room_id=${query.room_id}`
+    var socketUrl = `wss://uler-tangga-api.herokuapp.com/uler_tangga/start?id=${query.id}&room_id=${query.room_id}`
     ws.current = new WebSocket(socketUrl)
     ws.current.onopen = () => {
       console.log("CONNECTION OPEN")
