@@ -7,17 +7,7 @@ export default function Home() {
 
   return (
     <div className="bg-[#385E72] h-screen pt-4 pb-2 px-2">
-      <div
-        className="mx-auto max-w-[980px] bg-[url('/images/bg.jpeg')] bg-cover bg-center backdrop-blur-sm p-4 rounded-xl shadow-xl shadow-cyan-500 h-full"
-        style={{
-          "mask-image": `radial-gradient(
-            white 0%,
-            white 30%,
-            transparent 80%,
-            transparent
-          )`
-        }}
-      >
+      <div className="mx-auto max-w-[980px] bg-clip-border bg-[url('/images/bg.jpeg')] bg-cover bg-center backdrop-blur-sm p-4 rounded-xl shadow-xl shadow-cyan-500 h-full">
         <div className="container mt-8 mx-auto p-4 rounded-xl text-center">
           <span className="text-5xl font-bold font-sans drop-shadow-lg rounded-xl p-2 subpixel-antialiased text-[#071330]">ULAR TANGGA ONLINE</span>
         </div>

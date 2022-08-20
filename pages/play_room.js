@@ -70,7 +70,7 @@ export default function Home() {
     }
 
     var socketUrl = `ws://localhost:6001/uler_tangga/start?id=${query.id}&room_id=${query.room_id}`
-    var socketUrl = `wss://uler-tangga-api.herokuapp.com/uler_tangga/start?id=${query.id}&room_id=${query.room_id}`
+    // var socketUrl = `wss://uler-tangga-api.herokuapp.com/uler_tangga/start?id=${query.id}&room_id=${query.room_id}`
     ws.current = new WebSocket(socketUrl)
     ws.current.onopen = () => {
       console.log("CONNECTION OPEN")
@@ -125,6 +125,9 @@ export default function Home() {
     } else if (response.response_kind === "player_roll_number") {
       handleKindRollNumber(response.data)
 
+    } else if (response.response_kind === "player_end_turn") {
+      handleKindPlayerEndTurn(response.data)
+
     } else {
       console.error("INVALID RESPONSE KIND", response)
     }
@@ -141,6 +144,33 @@ export default function Home() {
   }
 
   function handleKindMovePlayer(data) {
+    var playerIndex = data.player.identity.room_player_index_string
+    var moveCount = data.number
+    var tempBoard = {...baseBoard}
+
+    var selectedPion = tempBoard.player_room_index_map[playerIndex]
+
+    var prevIndex = parseInt(selectedPion.index_position)
+    var nextIndex = prevIndex + moveCount
+
+    var fromPos = tempBoard.map_config.direction[prevIndex]
+    var targetPos = tempBoard.map_config.direction[nextIndex]
+
+    swapArrayElements(tempBoard.player_room_index_map[playerIndex].map_position, fromPos, targetPos)
+
+    tempBoard.player_room_index_map[playerIndex].index_position += moveCount
+
+    setBoard({...baseBoard, player_room_index_map: tempBoard.player_room_index_map})
+
+    if (tempBoard.player_room_index_map[playerIndex].index_position >= (tempBoard.map_config.size - 1)) {
+      setIsWinner(true)
+      confettiButton.click()
+    }
+
+    setBoard({...baseBoard, active_player: data.player})
+  }
+
+  function handleKindPlayerEndTurn(data) {
     var playerIndex = data.player.identity.room_player_index_string
     var moveCount = data.number
     var tempBoard = {...baseBoard}
@@ -193,7 +223,11 @@ export default function Home() {
   }
 
   function handleSendFinishTurn() {
-
+    var wsPayload = {
+      "action": "player_end_turn",
+      "payload": {}
+    }
+    ws.current.send(JSON.stringify(wsPayload))
   }
 
   // ===================================================================================== HANDLE SENDING START
@@ -233,10 +267,10 @@ export default function Home() {
     <div className="bg-[#385E72] h-screen pt-4">
       <div className="container mx-auto">
         <div className="">
-          <div className="mx-1 rounded">
+          <div className="mx-1 rounded bg-[url('/images/map_1.png')]">
             <div className="grid grid-cols-10 gap-0 rounded">
               {board.map_config.numbering.map((number, index) => (
-                <div className={`w-[full] ${fieldHeight} bg-[#EEF4ED] border p-[0px] rounded`} key={index}>
+                <div className={`w-[full] ${fieldHeight} bg-[#EEF4ED] bg-opacity-30 border p-[0px] rounded`} key={index}>
                   <span className="text-[10px] leading-none ml-[4px]">{number}</span>
                 </div>
               ))}
@@ -315,6 +349,7 @@ export default function Home() {
             </div>
           </div>
         </div>
+
         <div className="overflow-hidden">
           <span className="confetti-button"></span>
         </div>
@@ -323,36 +358,128 @@ export default function Home() {
       <div className="h-[200px]"></div>
 
       <div className="z-10 fixed flex inset-x-0 w-full botttom-0">
-        <div className="bg-blue-100 block fixed inset-x-0 bottom-0 z-10">
-          <div></div>
-          <div className="flex justify-between">
-            <div className="p-2">
-              <button className="btn border p-2 rounded mr-1" onClick={()=>handleSendRollNumber()}>PUTAR ANGKA</button>
-              <button className="btn border p-2 rounded" onClick={()=>handleSendMove()}>JALAN</button>
+
+        <div className="bg-blue-100 block fixed inset-x-0 bottom-0 z-10 border rounded-lg h-[185px]">
+
+          <div className="fixed bottom-[190px] left-[3px] bg-opacity-90 rounded-lg mt-[-10px] py-1 px-2 bg-blue-100">
+            {board.active_player.identity.name} : {board.active_player.next_state}
+          </div>
+
+          <div className="grid grid-cols-10 gap-0 rounded">
+            <div className="col-span-3 p-1">
+              <div>
+                <label className="block text-gray-700 text-sm font-bold">
+                  Nama
+                </label>
+                <small>Jhone Doe</small>
+              </div>
+              <div>
+                <label className="block text-gray-700 text-sm font-bold">
+                  HP
+                </label>
+                <div className="w-full bg-white rounded-full h-1.5 mb-4 dark:bg-gray-700">
+                  <div className="bg-green-600 h-1.5 rounded-full dark:bg-blue-500" style={{width: "45%"}}></div>
+                </div>
+              </div>
+              <div>
+                <label className="block text-gray-700 text-sm font-bold">
+                  MP
+                </label>
+                <div className="w-full bg-white rounded-full h-1.5 mb-4 dark:bg-gray-700">
+                  <div className="bg-blue-600 h-1.5 rounded-full dark:bg-blue-500" style={{width: "45%"}}></div>
+                </div>
+              </div>
+              <div className="flex justify-between">
+                <div>
+                  <i className="fa-solid fa-gun"></i> 20
+                </div>
+                <div>
+                <i className="fa-solid fa-shield-halved"></i> 10
+                </div>
+              </div>
             </div>
-            <div className="p-2">
-              <span>Lagi jalan: {board.active_player.identity.name}</span>
-              <br />
-              <span>Fase: {board.active_player.next_state}</span>
+            <div className="col-span-4 p-1">
+              <label className="block text-gray-700 text-sm font-bold mb-1">
+                Inventory
+              </label>
+
+              <div className="overflow-auto h-[127px]">
+                <div className="rounded-lg bg-white py-1 px-2 mb-2">
+                  Jalan sendiri +10
+                </div>
+                <div className="rounded-lg bg-white py-1 px-2 mb-2">
+                  Target jalan +10
+                </div>
+                <div className="rounded-lg bg-white py-1 px-2 mb-2">
+                  Target jalan +10
+                </div>
+                <div className="rounded-lg bg-white py-1 px-2 mb-2">
+                  Target jalan +10
+                </div>
+                <div className="rounded-lg bg-white py-1 px-2 mb-2">
+                  Target jalan +10
+                </div>
+                <div className="rounded-lg bg-white py-1 px-2 mb-2">
+                  Target jalan +10
+                </div>
+              </div>
+            </div>
+            <div className="col-span-3 p-1">
+              <div className="flex-col">
+                <ActionButtonDecider activePlayer={board.active_player}  />
+
+                <div className="border rounded p-1">
+                  <div className="mx-auto bg-white pl-8 rounded-xl border">
+                    <AnimatedNumbersNoSSR
+                      animateToNumber={activeNumber}
+                      fontStyle={{fontSize: 40}}
+                      configs={[
+                        { mass: 1, tension: 220, friction: 100 },
+                      ]}
+                    ></AnimatedNumbersNoSSR>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           {/* <button className="btn border p-2 rounded" onClick={()=>handleSendFinishTurn()}>SELESAI</button> */}
           <div className="p-2">
-            <div className="border rounded p-2">
-              <AnimatedNumbersNoSSR
-                animateToNumber={activeNumber}
-                fontStyle={{fontSize: 40}}
-                configs={[
-                  { mass: 1, tension: 220, friction: 100 },
-                ]}
-              ></AnimatedNumbersNoSSR>
-            </div>
+
           </div>
-          <div className="mb-6"></div>
         </div>
       </div>
 
       <div className="hidden pl-3 pl-5 pl-7 pt-5 pt-7"></div>
     </div>
   )
+
+  function ActionButtonDecider(props) {
+    if (props.activePlayer.next_state == "rolling_number") {
+      return(
+        <button className="btn w-full bg-[#ffafcc] border border-black p-2 rounded-lg shadow-lg" onClick={()=>handleSendRollNumber()}>
+          <span className="text-md">Putar Angka</span>
+        </button>
+      )
+    }
+
+    if (props.activePlayer.next_state == "moving") {
+      return(
+        <button className="btn bg-[#ffafcc] border border-black p-2 rounded-lg shadow-lg" onClick={()=>handleSendMove()}>
+          <span className="text-md">Jalan</span>
+        </button>
+      )
+    }
+
+    if (props.activePlayer.next_state == "end_turn") {
+      return(
+        <button className="btn bg-[#ffafcc] border border-black p-2 rounded-lg shadow-lg" onClick={()=>handleSendFinishTurn()}>
+          <span className="text-md">Selesai</span>
+        </button>
+      )
+    }
+
+    return(
+      <div></div>
+    )
+  }
 }
