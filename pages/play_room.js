@@ -70,7 +70,7 @@ export default function Home() {
     }
 
     var socketUrl = `ws://localhost:6001/uler_tangga/start?id=${query.id}&room_id=${query.room_id}`
-    // var socketUrl = `wss://uler-tangga-api.herokuapp.com/uler_tangga/start?id=${query.id}&room_id=${query.room_id}`
+    var socketUrl = `wss://uler-tangga-api.herokuapp.com/uler_tangga/start?id=${query.id}&room_id=${query.room_id}`
     ws.current = new WebSocket(socketUrl)
     ws.current.onopen = () => {
       console.log("CONNECTION OPEN")
@@ -234,6 +234,18 @@ export default function Home() {
 
   // ===================================================================================== HANDLE UTILS FUNC START
 
+  function avatarModal(selectedPlayer) {
+    console.log(selectedPlayer.id)
+  }
+
+  function fieldModal(selectedPlayer) {
+    console.log(selectedPlayer.id)
+  }
+
+  // ===================================================================================== HANDLE SENDING START
+
+  // ===================================================================================== HANDLE UTILS FUNC START
+
   function swapArrayElements(arr, indexA, indexB) {
     var temp = arr[indexA]
     arr[indexA] = arr[indexB]
@@ -264,41 +276,53 @@ export default function Home() {
   // ===================================================================================== HANDLE UTILS FUNC END
 
   return (
-    <div className="bg-[#385E72] h-screen pt-4">
+    <div className="bg-gradient-to-t from-[#385E72] to-blue-200 h-screen pt-4">
+      <div className="container p-1 mx-auto">
+        {Object.values(board.player_room_index_map).map((onePlayer, idx) => (
+          <span className="mr-4" key={idx}>
+            <i className={`${onePlayer.avatar["icon"]}`}></i>
+          </span>
+        ))}
+      </div>
+
       <div className="container mx-auto">
-        <div className="">
-          <div className="mx-1 rounded bg-[url('/images/map_1.png')]">
-            <div className="grid grid-cols-10 gap-0 rounded">
-              {board.map_config.numbering.map((number, index) => (
-                <div className={`w-[full] ${fieldHeight} bg-[#EEF4ED] bg-opacity-30 border p-[0px] rounded`} key={index}>
-                  <span className="text-[10px] leading-none ml-[4px]">{number}</span>
-                </div>
-              ))}
-            </div>
+        <div className="mx-1 rounded bg-[url('/images/map_1.png')]">
+          <div className="grid grid-cols-10 z-10 gap-0 rounded">
+            {board.map_config.numbering.map((number, index) => (
+              <div className={`w-full ${fieldHeight} bg-[#EEF4ED] bg-opacity-60 border p-[0px] rounded`} key={index}>
+                <span className="text-[10px] leading-none ml-[4px]">{number}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
       <div>
-        <div className={`absolute w-full z-1 top-0 ${board.player_count >= 1 ? "block" : "hidden"}`}>
+        <div className={`absolute w-full z-1 top-11 p-1 ${board.player_count >= 1 ? "block" : "hidden"}`}>
           <div className="container mx-auto">
-            <div className="grid grid-cols-10 gap-0" ref={parent_1}>
-              {board.player_room_index_map["1"] && board.player_room_index_map["1"].map_position.map((field) => (
-                <div className={`w-full ${fieldHeight} p-[0px]`} key={field.index}>
-                  <div className={classGenAvatarPosition(board.player_room_index_map["1"])}>
-                    { field?.is_here && <i className={classGenAvatar(board.player_room_index_map["1"])}></i> }
+            <div className="mx-1">
+              <div className="grid grid-cols-10 gap-0 rounded" ref={parent_1}>
+                {board.player_room_index_map["1"] && board.player_room_index_map["1"].map_position.map((field) => (
+                  <div className={`w-full ${fieldHeight} p-[0px] rounded`} key={field.index}>
+                    <div className={`ml-1 mt-7`} >
+                      { field?.is_here && <i
+                        className={classGenAvatar(board.player_room_index_map["1"])}
+                        onClick={()=>avatarModal(board.player_room_index_map["1"])}
+                      ></i> }
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+
             </div>
           </div>
         </div>
 
-        <div className={`absolute w-full z-1 top-0 ${board.player_count >= 2 ? "block" : "hidden"}`}>
+        <div className={`absolute w-full z-1 top-11 p-1 ${board.player_count >= 2 ? "block" : "hidden"}`}>
           <div className="container mx-auto">
             <div className="grid grid-cols-10 gap-0" ref={parent_2}>
               {board.player_room_index_map["2"] && board.player_room_index_map["2"]["map_position"].map((field) => (
-                <div className={`w-full ${fieldHeight} p-[0px]`} key={field.index}>
+                <div className={`w-full ${fieldHeight} p-[0px] ${field.is_here ? "block" : "hidden"}`} key={field.index}>
                   <div className={classGenAvatarPosition(board.player_room_index_map["2"])}>
                     { field.is_here && <i className={classGenAvatar(board.player_room_index_map["2"])}></i> }
                   </div>
@@ -308,7 +332,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className={`absolute w-full z-1 top-0 ${board.player_count >= 3 ? "block" : "hidden"}`}>
+        <div className={`absolute w-full z-1 top-11 p-1 ${board.player_count >= 3 ? "block" : "hidden"}`}>
           <div className="container mx-auto">
             <div className="grid grid-cols-10 gap-0" ref={parent_3}>
               {board.player_room_index_map["3"] && board.player_room_index_map["3"]["map_position"].map((field) => (
@@ -322,7 +346,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className={`absolute w-full z-1 top-0 ${board.player_count >= 4 ? "block" : "hidden"}`}>
+        <div className={`absolute w-full z-1 top-11 p-1 ${board.player_count >= 4 ? "block" : "hidden"}`}>
           <div className="container mx-auto">
             <div className="grid grid-cols-10 gap-0" ref={parent_4}>
               {board.player_room_index_map["4"] && board.player_room_index_map["4"]["map_position"].map((field) => (
@@ -336,7 +360,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className={`absolute w-full z-1 top-0 ${board.player_count >= 5 ? "block" : "hidden"}`}>
+        <div className={`absolute w-full z-1 top-11 p-1 ${board.player_count >= 5 ? "block" : "hidden"}`}>
           <div className="container mx-auto">
             <div className="grid grid-cols-10 gap-0" ref={parent_5}>
               {board.player_room_index_map["5"] && board.player_room_index_map["5"]["map_position"].map((field) => (
@@ -355,13 +379,23 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="h-[200px]"></div>
+      <div className="absolute w-full z-1 top-11 p-1 container mx-auto">
+        <div className="mx-1 rounded">
+          <div className="grid grid-cols-10 z-10 gap-0 rounded">
+            {board.map_config.numbering.map((number, index) => (
+              <div className={`w-full ${fieldHeight} bg-transparent p-[0px] rounded`} key={index}>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="h-[230px]"></div>
 
       <div className="z-10 fixed flex inset-x-0 w-full botttom-0">
 
-        <div className="bg-blue-100 block fixed inset-x-0 bottom-0 z-10 border rounded-lg h-[185px]">
-
-          <div className="fixed bottom-[190px] left-[3px] bg-opacity-90 rounded-lg mt-[-10px] py-1 px-2 bg-blue-100">
+        <div className="bg-gradient-to-t from-blue-300 to-blue-100 block fixed inset-x-0 bottom-0 z-10 border rounded-t-xl h-[185px] p-1">
+          <div className="fixed bottom-[190px] left-[3px] bg-opacity-90 rounded-lg mt-[-10px] py-1 px-2 bg-gradient-to-t from-blue-300 to-blue-100">
             {board.active_player.identity.name} : {board.active_player.next_state}
           </div>
 
@@ -371,14 +405,15 @@ export default function Home() {
                 <label className="block text-gray-700 text-sm font-bold">
                   Nama
                 </label>
-                <small>Jhone Doe</small>
+                <small>{board?.player_map[query.id]?.identity?.name}</small>
               </div>
+              <hr />
               <div>
                 <label className="block text-gray-700 text-sm font-bold">
                   HP
                 </label>
                 <div className="w-full bg-white rounded-full h-1.5 mb-4 dark:bg-gray-700">
-                  <div className="bg-green-600 h-1.5 rounded-full dark:bg-blue-500" style={{width: "45%"}}></div>
+                  <div className="bg-green-600 h-1.5 rounded-full dark:bg-blue-500" style={{width: "80%"}}></div>
                 </div>
               </div>
               <div>
@@ -386,7 +421,7 @@ export default function Home() {
                   MP
                 </label>
                 <div className="w-full bg-white rounded-full h-1.5 mb-4 dark:bg-gray-700">
-                  <div className="bg-blue-600 h-1.5 rounded-full dark:bg-blue-500" style={{width: "45%"}}></div>
+                  <div className="bg-blue-600 h-1.5 rounded-full dark:bg-blue-500" style={{width: "60%"}}></div>
                 </div>
               </div>
               <div className="flex justify-between">
@@ -426,10 +461,12 @@ export default function Home() {
             </div>
             <div className="col-span-3 p-1">
               <div className="flex-col">
-                <ActionButtonDecider activePlayer={board.active_player}  />
+                <div className="mb-2">
+                  <ActionButtonDecider activePlayer={board.active_player}  />
+                </div>
 
-                <div className="border rounded p-1">
-                  <div className="mx-auto bg-white pl-8 rounded-xl border">
+                <div className="mb-2">
+                  <div className="flex justify-center bg-white rounded-xl border shadow-inner shadow-lg">
                     <AnimatedNumbersNoSSR
                       animateToNumber={activeNumber}
                       fontStyle={{fontSize: 40}}
@@ -464,7 +501,7 @@ export default function Home() {
 
     if (props.activePlayer.next_state == "moving") {
       return(
-        <button className="btn bg-[#ffafcc] border border-black p-2 rounded-lg shadow-lg" onClick={()=>handleSendMove()}>
+        <button className="btn w-full bg-[#ffafcc] border border-black p-2 rounded-lg shadow-lg" onClick={()=>handleSendMove()}>
           <span className="text-md">Jalan</span>
         </button>
       )
@@ -472,7 +509,7 @@ export default function Home() {
 
     if (props.activePlayer.next_state == "end_turn") {
       return(
-        <button className="btn bg-[#ffafcc] border border-black p-2 rounded-lg shadow-lg" onClick={()=>handleSendFinishTurn()}>
+        <button className="btn w-full bg-[#ffafcc] border border-black p-2 rounded-lg shadow-lg" onClick={()=>handleSendFinishTurn()}>
           <span className="text-md">Selesai</span>
         </button>
       )
