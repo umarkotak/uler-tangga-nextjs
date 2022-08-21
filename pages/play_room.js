@@ -2,7 +2,7 @@ import { useRef, useState, useCallback, useEffect } from 'react'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
-import { confetti } from 'dom-confetti';
+import { confetti } from 'dom-confetti'
 
 export default function Home() {
   let router = useRouter()
@@ -29,6 +29,7 @@ export default function Home() {
       size: 0,
       numbering: [],
       direction: [],
+      field_effect: {},
     },
     player_count: 0,
     player_map: {},
@@ -273,6 +274,11 @@ export default function Home() {
     { ssr: false }
   )
 
+  const LineToNoSSR = dynamic(
+    () => import("react-lineto"),
+    { ssr: false }
+  )
+
   // ===================================================================================== HANDLE UTILS FUNC END
 
   return (
@@ -320,7 +326,7 @@ export default function Home() {
         <div className={`absolute w-full z-1 top-11 p-1 ${board.player_count >= 2 ? "block" : "hidden"}`}>
           <div className="container mx-auto">
             <div className="mx-1">
-              <div className="grid grid-cols-10 gap-0 rounded" ref={parent_1}>
+              <div className="grid grid-cols-10 gap-0 rounded" ref={parent_2}>
                 {board.player_room_index_map["2"] && board.player_room_index_map["2"].map_position.map((field) => (
                   <div className={`w-full ${fieldHeight} p-[0px] rounded`} key={field.index}>
                     <div className={`ml-1 mt-7`} >
@@ -339,7 +345,7 @@ export default function Home() {
         <div className={`absolute w-full z-1 top-11 p-1 ${board.player_count >= 3 ? "block" : "hidden"}`}>
           <div className="container mx-auto">
             <div className="mx-1">
-              <div className="grid grid-cols-10 gap-0 rounded" ref={parent_1}>
+              <div className="grid grid-cols-10 gap-0 rounded" ref={parent_3}>
                 {board.player_room_index_map["3"] && board.player_room_index_map["3"].map_position.map((field) => (
                   <div className={`w-full ${fieldHeight} p-[0px] rounded`} key={field.index}>
                     <div className={`ml-1 mt-7`} >
@@ -358,7 +364,7 @@ export default function Home() {
         <div className={`absolute w-full z-1 top-11 p-1 ${board.player_count >= 4 ? "block" : "hidden"}`}>
           <div className="container mx-auto">
             <div className="mx-1">
-              <div className="grid grid-cols-10 gap-0 rounded" ref={parent_1}>
+              <div className="grid grid-cols-10 gap-0 rounded" ref={parent_4}>
                 {board.player_room_index_map["4"] && board.player_room_index_map["4"].map_position.map((field) => (
                   <div className={`w-full ${fieldHeight} p-[0px] rounded`} key={field.index}>
                     <div className={`ml-1 mt-7`} >
@@ -379,13 +385,21 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="absolute w-full z-1 top-11 p-1 container mx-auto">
-        <div className="mx-1 rounded">
-          <div className="grid grid-cols-10 z-10 gap-0 rounded">
-            {board.map_config.numbering.map((number, index) => (
-              <div className={`w-full ${fieldHeight} bg-transparent p-[0px] rounded`} key={index}>
-              </div>
-            ))}
+      <div className="absolute w-full z-1 top-11 p-1 ">
+        <div className="container mx-auto">
+          <div className="mx-1 rounded">
+            <div className="grid grid-cols-10 z-10 gap-0 rounded">
+              {board.map_config.numbering.map((number, index) => (
+                <div className={`w-full ${fieldHeight} hover:bg-white p-[0px] hover:bg-opacity-50 rounded target-line-${number}`} key={index}>
+                </div>
+              ))}
+              {Object.values(board.map_config.field_effect).map((effect, idx) => (
+                effect.benefit_type === "player_move" && <div className="" key={idx}>
+                  <LineToNoSSR className="" from={`target-line-${effect.effect_player_move.from_coordinate}`} to={`target-line-${effect.effect_player_move.to_coordinate}`} borderColor={effect.effect_player_move.direction === "up" ? "#7FB77E" : "#C21010"} borderStyle={effect.effect_player_move.direction === "up" ? "solid" : "dashed"} borderWidth={2} />
+                  {/* <LineToNoSSR from={`target-line-18`} to={`target-line-1`} borderColor="#C21010" borderStyle="dashed" borderWidth={2} /> */}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -394,95 +408,95 @@ export default function Home() {
 
       <div className="z-10 fixed flex inset-x-0 w-full botttom-0">
 
-        <div className="bg-gradient-to-t from-blue-300 to-blue-100 block fixed inset-x-0 bottom-0 z-10 border rounded-t-xl h-[185px] p-1">
-          <div className="fixed bottom-[190px] left-[3px] bg-opacity-90 rounded-lg mt-[-10px] py-1 px-2 bg-gradient-to-t from-blue-300 to-blue-100">
-            {board.active_player.identity.name} : {board.active_player.next_state}
-          </div>
+        <div className="bg-gradient-to-t from-blue-300 to-blue-100 block fixed inset-x-0 bottom-0 z-10 border rounded-t-xl h-[185px] p-1 shadow-inner">
+          <div className="container mx-auto">
+            <div className="fixed bottom-[190px] bg-opacity-90 rounded-lg mt-[-10px] py-1 px-2 bg-gradient-to-t from-blue-300 to-blue-100">
+              {board.active_player.identity.name} : {board.active_player.next_state}
+            </div>
 
-          <div className="grid grid-cols-10 gap-0 rounded">
-            <div className="col-span-3 p-1">
-              <div>
-                <label className="block text-gray-700 text-sm font-bold">
-                  Nama
-                </label>
-                <small>{board?.player_map[query.id]?.identity?.name}</small>
-              </div>
-              <hr />
-              <div>
-                <label className="block text-gray-700 text-sm font-bold">
-                  HP
-                </label>
-                <div className="w-full bg-white rounded-full h-1.5 mb-4 dark:bg-gray-700">
-                  <div className="bg-green-600 h-1.5 rounded-full dark:bg-blue-500" style={{width: "80%"}}></div>
-                </div>
-              </div>
-              <div>
-                <label className="block text-gray-700 text-sm font-bold">
-                  MP
-                </label>
-                <div className="w-full bg-white rounded-full h-1.5 mb-4 dark:bg-gray-700">
-                  <div className="bg-blue-600 h-1.5 rounded-full dark:bg-blue-500" style={{width: "60%"}}></div>
-                </div>
-              </div>
-              <div className="flex justify-between">
+            <div className="grid grid-cols-10 gap-0 rounded">
+              <div className="col-span-3 p-1">
                 <div>
-                  <i className="fa-solid fa-gun"></i> 20
+                  <label className="block text-gray-700 text-sm font-bold">
+                    Nama
+                  </label>
+                  <small>{board?.player_map[query.id]?.identity?.name}</small>
+                </div>
+                <hr />
+                <div>
+                  <label className="block text-gray-700 text-sm font-bold">
+                    HP
+                  </label>
+                  <div className="w-full bg-white rounded-full h-1.5 mb-4 dark:bg-gray-700">
+                    <div className="bg-green-600 h-1.5 rounded-full dark:bg-green-500" style={{width: "80%"}}></div>
+                  </div>
                 </div>
                 <div>
-                <i className="fa-solid fa-shield-halved"></i> 10
+                  <label className="block text-gray-700 text-sm font-bold">
+                    MP
+                  </label>
+                  <div className="w-full bg-white rounded-full h-1.5 mb-4 dark:bg-gray-700">
+                    <div className="bg-blue-600 h-1.5 rounded-full dark:bg-blue-500" style={{width: "60%"}}></div>
+                  </div>
+                </div>
+                <div className="flex justify-between">
+                  <div>
+                    <i className="fa-solid fa-gun"></i> 20
+                  </div>
+                  <div>
+                  <i className="fa-solid fa-shield-halved"></i> 10
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="col-span-4 p-1">
-              <label className="block text-gray-700 text-sm font-bold mb-1">
-                Inventory
-              </label>
+              <div className="col-span-4 p-1">
+                <label className="block text-gray-700 text-sm font-bold mb-1">
+                  Inventory
+                </label>
 
-              <div className="overflow-auto h-[127px]">
-                <div className="rounded-lg bg-white py-1 px-2 mb-2">
-                  Jalan sendiri +10
-                </div>
-                <div className="rounded-lg bg-white py-1 px-2 mb-2">
-                  Target jalan +10
-                </div>
-                <div className="rounded-lg bg-white py-1 px-2 mb-2">
-                  Target jalan +10
-                </div>
-                <div className="rounded-lg bg-white py-1 px-2 mb-2">
-                  Target jalan +10
-                </div>
-                <div className="rounded-lg bg-white py-1 px-2 mb-2">
-                  Target jalan +10
-                </div>
-                <div className="rounded-lg bg-white py-1 px-2 mb-2">
-                  Target jalan +10
+                <div className="overflow-auto h-[127px]">
+                  <div className="rounded-lg bg-white py-1 px-2 mb-2">
+                    Jalan sendiri +10
+                  </div>
+                  <div className="rounded-lg bg-white py-1 px-2 mb-2">
+                    Target jalan +10
+                  </div>
+                  <div className="rounded-lg bg-white py-1 px-2 mb-2">
+                    Target jalan +10
+                  </div>
+                  <div className="rounded-lg bg-white py-1 px-2 mb-2">
+                    Target jalan +10
+                  </div>
+                  <div className="rounded-lg bg-white py-1 px-2 mb-2">
+                    Target jalan +10
+                  </div>
+                  <div className="rounded-lg bg-white py-1 px-2 mb-2">
+                    Target jalan +10
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="col-span-3 p-1">
-              <div className="flex-col">
-                <div className="mb-2">
-                  <ActionButtonDecider activePlayer={board.active_player}  />
-                </div>
+              <div className="col-span-3 p-1">
+                <div className="flex-col">
+                  <div className="mb-2">
+                    <ActionButtonDecider activePlayer={board.active_player}  />
+                  </div>
 
-                <div className="mb-2">
-                  <div className="flex justify-center bg-white rounded-xl border shadow-inner shadow-lg">
-                    <AnimatedNumbersNoSSR
-                      animateToNumber={activeNumber}
-                      fontStyle={{fontSize: 40}}
-                      configs={[
-                        { mass: 1, tension: 220, friction: 100 },
-                      ]}
-                    ></AnimatedNumbersNoSSR>
+                  <div className="mb-2">
+                    <div className="flex justify-center bg-white rounded-xl border shadow-inner shadow-lg">
+                      <AnimatedNumbersNoSSR
+                        animateToNumber={activeNumber}
+                        fontStyle={{fontSize: 40}}
+                        configs={[
+                          { mass: 1, tension: 220, friction: 100 },
+                        ]}
+                      ></AnimatedNumbersNoSSR>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          {/* <button className="btn border p-2 rounded" onClick={()=>handleSendFinishTurn()}>SELESAI</button> */}
-          <div className="p-2">
 
-          </div>
+          <div className="p-2" />
         </div>
       </div>
 

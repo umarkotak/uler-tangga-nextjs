@@ -18,6 +18,7 @@
     "react-dice-complete": "^1.2.1",
     "react-dice-roll": "^1.2.2",
     "react-dom": "18.2.0",
+    "react-lineto": "^3.3.0",
     "react-random-reveal": "^2.0.0",
     "react-use-websocket": "^3.0.0"
   },
