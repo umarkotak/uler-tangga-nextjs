@@ -3,6 +3,7 @@ import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
 import { confetti } from 'dom-confetti'
+import Xarrow from "react-xarrows"
 
 export default function Home() {
   let router = useRouter()
@@ -283,7 +284,7 @@ export default function Home() {
 
   return (
     <div className="bg-gradient-to-t from-[#385E72] to-blue-200 h-screen pt-4">
-      <div className="container p-1 mx-auto">
+      <div className="container p-1 mx-auto max-w-[1024px]">
         {Object.values(board.player_room_index_map).map((onePlayer, idx) => (
           <span className="mr-4" key={idx}>
             <i className={`${onePlayer.avatar["icon"]}`}></i>
@@ -291,8 +292,8 @@ export default function Home() {
         ))}
       </div>
 
-      <div className="container mx-auto">
-        <div className="mx-1 rounded bg-[url('/images/map_1.png')]">
+      <div className="container mx-auto max-w-[1024px]">
+        <div className="mx-1 rounded bg-[url('/images/map_1.png')] ">
           <div className="grid grid-cols-10 z-10 gap-0 rounded">
             {board.map_config.numbering.map((number, index) => (
               <div className={`w-full ${fieldHeight} bg-[#EEF4ED] bg-opacity-60 border p-[0px] rounded`} key={index}>
@@ -305,7 +306,7 @@ export default function Home() {
 
       <div>
         <div className={`absolute w-full z-1 top-11 p-1 ${board.player_count >= 1 ? "block" : "hidden"}`}>
-          <div className="container mx-auto">
+          <div className="container mx-auto max-w-[1024px]">
             <div className="mx-1">
               <div className="grid grid-cols-10 gap-0 rounded" ref={parent_1}>
                 {board.player_room_index_map["1"] && board.player_room_index_map["1"].map_position.map((field) => (
@@ -386,16 +387,25 @@ export default function Home() {
       </div>
 
       <div className="absolute w-full z-1 top-11 p-1 ">
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-[1024px]">
           <div className="mx-1 rounded">
             <div className="grid grid-cols-10 z-10 gap-0 rounded">
               {board.map_config.numbering.map((number, index) => (
-                <div className={`w-full ${fieldHeight} hover:bg-white p-[0px] hover:bg-opacity-50 rounded target-line-${number}`} key={index}>
+                <div className={`w-full ${fieldHeight} hover:bg-white p-[0px] hover:bg-opacity-50 rounded target-line-${number}`} id={`target-line-${number}`} key={index}>
                 </div>
               ))}
               {Object.values(board.map_config.field_effect).map((effect, idx) => (
                 effect.benefit_type === "player_move" && <div className="" key={idx}>
-                  <LineToNoSSR className="" from={`target-line-${effect.effect_player_move.from_coordinate}`} to={`target-line-${effect.effect_player_move.to_coordinate}`} borderColor={effect.effect_player_move.direction === "up" ? "#7FB77E" : "#C21010"} borderStyle={effect.effect_player_move.direction === "up" ? "solid" : "dashed"} borderWidth={2} />
+                  {/* <LineToNoSSR className="after:content-['◉'] after:border-black" to={`target-line-${effect.effect_player_move.from_coordinate}`} from={`target-line-${effect.effect_player_move.to_coordinate}`} borderColor={effect.effect_player_move.direction === "up" ? "#7FB77E" : "#C21010"} borderStyle={effect.effect_player_move.direction === "up" ? "solid" : "dashed"} borderWidth={2} /> */}
+                  <Xarrow
+                    start={`target-line-${effect.effect_player_move.from_coordinate}`}
+                    end={`target-line-${effect.effect_player_move.to_coordinate}`}
+                    color={effect.effect_player_move.direction === "up" ? "#7FB77E" : "#C21010"}
+                    dashness={effect.effect_player_move.direction === "up" ? false : true}
+                    strokeWidth={3}
+                    startAnchor={"middle"}
+                    endAnchor={"middle"}
+                  />
                   {/* <LineToNoSSR from={`target-line-18`} to={`target-line-1`} borderColor="#C21010" borderStyle="dashed" borderWidth={2} /> */}
                 </div>
               ))}
@@ -409,7 +419,7 @@ export default function Home() {
       <div className="z-10 fixed flex inset-x-0 w-full botttom-0">
 
         <div className="bg-gradient-to-t from-blue-300 to-blue-100 block fixed inset-x-0 bottom-0 z-10 border rounded-t-xl h-[185px] p-1 shadow-inner">
-          <div className="container mx-auto">
+          <div className="container mx-auto max-w-[1024px]">
             <div className="fixed bottom-[190px] bg-opacity-90 rounded-lg mt-[-10px] py-1 px-2 bg-gradient-to-t from-blue-300 to-blue-100">
               {board.active_player.identity.name} : {board.active_player.next_state}
             </div>
