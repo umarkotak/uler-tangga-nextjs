@@ -296,8 +296,21 @@ export default function Home() {
         <div className="mx-1 rounded bg-[url('/images/map_1.png')] ">
           <div className="grid grid-cols-10 z-10 gap-0 rounded">
             {board.map_config.numbering.map((number, index) => (
-              <div className={`w-full ${fieldHeight} bg-[#EEF4ED] bg-opacity-60 border p-[0px] rounded`} key={index}>
+              <div className={`w-full ${fieldHeight} bg-[#EEF4ED] bg-opacity-60 border p-[0px] rounded`} id={`target-line-${number}`} key={index}>
                 <span className="text-[10px] leading-none ml-[4px]">{number}</span>
+              </div>
+            ))}
+            {Object.values(board.map_config.field_effect).map((effect, idx) => (
+              effect.benefit_type === "player_move" && <div className="" key={idx}>
+                <Xarrow
+                  start={`target-line-${effect.effect_player_move.from_coordinate}`}
+                  end={`target-line-${effect.effect_player_move.to_coordinate}`}
+                  color={effect.effect_player_move.direction === "up" ? "#7FB77E" : "#C21010"}
+                  dashness={effect.effect_player_move.direction === "up" ? false : true}
+                  strokeWidth={3}
+                  startAnchor={"middle"}
+                  endAnchor={"middle"}
+                />
               </div>
             ))}
           </div>
@@ -325,7 +338,7 @@ export default function Home() {
         </div>
 
         <div className={`absolute w-full z-1 top-11 p-1 ${board.player_count >= 2 ? "block" : "hidden"}`}>
-          <div className="container mx-auto">
+          <div className="container mx-auto max-w-[1024px]">
             <div className="mx-1">
               <div className="grid grid-cols-10 gap-0 rounded" ref={parent_2}>
                 {board.player_room_index_map["2"] && board.player_room_index_map["2"].map_position.map((field) => (
@@ -344,7 +357,7 @@ export default function Home() {
         </div>
 
         <div className={`absolute w-full z-1 top-11 p-1 ${board.player_count >= 3 ? "block" : "hidden"}`}>
-          <div className="container mx-auto">
+          <div className="container mx-auto max-w-[1024px]">
             <div className="mx-1">
               <div className="grid grid-cols-10 gap-0 rounded" ref={parent_3}>
                 {board.player_room_index_map["3"] && board.player_room_index_map["3"].map_position.map((field) => (
@@ -363,7 +376,7 @@ export default function Home() {
         </div>
 
         <div className={`absolute w-full z-1 top-11 p-1 ${board.player_count >= 4 ? "block" : "hidden"}`}>
-          <div className="container mx-auto">
+          <div className="container mx-auto max-w-[1024px]">
             <div className="mx-1">
               <div className="grid grid-cols-10 gap-0 rounded" ref={parent_4}>
                 {board.player_room_index_map["4"] && board.player_room_index_map["4"].map_position.map((field) => (
@@ -394,21 +407,6 @@ export default function Home() {
                 <div className={`w-full ${fieldHeight} hover:bg-white p-[0px] hover:bg-opacity-50 rounded target-line-${number}`} id={`target-line-${number}`} key={index}>
                 </div>
               ))}
-              {Object.values(board.map_config.field_effect).map((effect, idx) => (
-                effect.benefit_type === "player_move" && <div className="" key={idx}>
-                  {/* <LineToNoSSR className="after:content-['◉'] after:border-black" to={`target-line-${effect.effect_player_move.from_coordinate}`} from={`target-line-${effect.effect_player_move.to_coordinate}`} borderColor={effect.effect_player_move.direction === "up" ? "#7FB77E" : "#C21010"} borderStyle={effect.effect_player_move.direction === "up" ? "solid" : "dashed"} borderWidth={2} /> */}
-                  <Xarrow
-                    start={`target-line-${effect.effect_player_move.from_coordinate}`}
-                    end={`target-line-${effect.effect_player_move.to_coordinate}`}
-                    color={effect.effect_player_move.direction === "up" ? "#7FB77E" : "#C21010"}
-                    dashness={effect.effect_player_move.direction === "up" ? false : true}
-                    strokeWidth={3}
-                    startAnchor={"middle"}
-                    endAnchor={"middle"}
-                  />
-                  {/* <LineToNoSSR from={`target-line-18`} to={`target-line-1`} borderColor="#C21010" borderStyle="dashed" borderWidth={2} /> */}
-                </div>
-              ))}
             </div>
           </div>
         </div>
@@ -421,7 +419,7 @@ export default function Home() {
         <div className="bg-gradient-to-t from-blue-300 to-blue-100 block fixed inset-x-0 bottom-0 z-10 border rounded-t-xl h-[185px] p-1 shadow-inner">
           <div className="container mx-auto max-w-[1024px]">
             <div className="fixed bottom-[190px] bg-opacity-90 rounded-lg mt-[-10px] py-1 px-2 bg-gradient-to-t from-blue-300 to-blue-100">
-              {board.active_player.identity.name} : {board.active_player.next_state}
+              {board.active_player.identity.name} jalan : {board.active_player.next_state}
             </div>
 
             <div className="grid grid-cols-10 gap-0 rounded">
@@ -515,6 +513,14 @@ export default function Home() {
   )
 
   function ActionButtonDecider(props) {
+    if (props.activePlayer.identity.id !== query.id) {
+      return(
+        <button className="btn w-full bg-[#ffafcc] border border-black p-2 rounded-lg shadow-lg disabled:bg-slate-50" disabled={true}>
+          <span className="text-md">Menunggu</span>
+        </button>
+      )
+    }
+
     if (props.activePlayer.next_state == "rolling_number") {
       return(
         <button className="btn w-full bg-[#ffafcc] border border-black p-2 rounded-lg shadow-lg" onClick={()=>handleSendRollNumber()}>
