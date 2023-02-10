@@ -8,8 +8,8 @@ class UlerTanggaApi {
     // }
 
     // this.AnimapuApiHost = "https://animapu-api.herokuapp.com"
-    // this.AnimapuApiHost = "https://animapu.site"
-    this.UlerTanggaApiHost = "http://localhost:6001"
+    this.UlerTanggaApiHost = "http://localhost:12000"
+    this.UlerTanggaApiHost = "https://uler-tangga-api.animapu.site"
   }
 
   async GetRoomList(params) {

@@ -7,8 +7,8 @@ import Xarrow from "react-xarrows"
 
 import ulerTanggaApi from "../apis/UlerTanggaApi"
 
-var host = "ws://localhost:6001"
-// var host = "wss://uler-tangga-api.herokuapp.com"
+var host = "ws://localhost:12000"
+var host = "wss://uler-tangga-api.animapu.site"
 
 export default function Home() {
   let router = useRouter()
@@ -50,6 +50,7 @@ export default function Home() {
   const [board, setBoard] = useState(baseBoard)
   const [activeNumber, setActiveNumber] = useState(1)
   const [isWinner, setIsWinner] = useState(false)
+  const [myPlayerItems, setMyPlayerItems] = useState([])
 
   var confettiButton
 
@@ -139,19 +140,18 @@ export default function Home() {
 
     if (response.response_kind === "player_join_room") {
       handleKindJoinRoom(response.data)
-
     } else if (response.response_kind === "player_leave_room") {
       handleKindLeaveRoom(response.data)
-
     } else if (response.response_kind === "player_move") {
       handleKindMovePlayer(response.data)
-
     } else if (response.response_kind === "player_roll_number") {
       handleKindRollNumber(response.data)
-
     } else if (response.response_kind === "player_end_turn") {
       handleKindPlayerEndTurn(response.data)
-
+    } else if (response.response_kind === "room_data") {
+      handleKindRoomData(response.data)
+    } else if (response.response_kind === "player_used_item") {
+      handleKindPlayerUsedItem(response.data)
     } else {
       console.error("INVALID RESPONSE KIND", response)
     }
@@ -160,6 +160,7 @@ export default function Home() {
   function handleKindJoinRoom(data) {
     baseBoard = data
     setBoard(baseBoard)
+    setMyPlayerItems(baseBoard.player_map[query.id].items)
   }
 
   function handleKindLeaveRoom(data) {
@@ -219,11 +220,46 @@ export default function Home() {
     }
 
     setBoard({...baseBoard, active_player: data.next_player})
+
+    if (data.is_found_item && data.player.identity.id === query.id) {
+      setMyPlayerItems(data.player.items)
+    }
+  }
+
+  function handleKindRoomData(data) {
+    baseBoard = data
+    setBoard(baseBoard)
   }
 
   function handleKindRollNumber(data) {
     setActiveNumber(data.number)
     setBoard({...baseBoard, active_player: data.player})
+  }
+
+  function handleKindPlayerUsedItem(data) {
+    var moveData = data.move_response
+    var playerIndex = moveData.player.identity.room_player_index_string
+    var moveCount = moveData.number
+    var tempBoard = {...baseBoard}
+
+    var selectedPion = tempBoard.player_room_index_map[playerIndex]
+
+    var prevIndex = parseInt(selectedPion.index_position)
+    var nextIndex = prevIndex + moveCount
+
+    var fromPos = tempBoard.map_config.direction[prevIndex]
+    var targetPos = tempBoard.map_config.direction[nextIndex]
+
+    swapArrayElements(tempBoard.player_room_index_map[playerIndex].map_position, fromPos, targetPos)
+
+    tempBoard.player_room_index_map[playerIndex].index_position += moveCount
+
+    setBoard({...baseBoard, player_room_index_map: tempBoard.player_room_index_map})
+
+    if (tempBoard.player_room_index_map[playerIndex].index_position >= (tempBoard.map_config.size - 1)) {
+      setIsWinner(true)
+      confettiButton.click()
+    }
   }
 
   // ===================================================================================== HANDLE INCOMING END
@@ -254,7 +290,26 @@ export default function Home() {
     ws.current.send(JSON.stringify(wsPayload))
   }
 
-  // ===================================================================================== HANDLE SENDING START
+  function handleRequestRoomData() {
+    var wsPayload = {
+      "action": "get_room_data_for_self",
+      "payload": {}
+    }
+    ws.current.send(JSON.stringify(wsPayload))
+  }
+
+  function handleUseItem(item_id) {
+    var wsPayload = {
+      "action": "player_use_item",
+      "payload": {
+        "item_random_id": item_id
+      }
+    }
+    ws.current.send(JSON.stringify(wsPayload))
+  }
+
+
+  // ===================================================================================== HANDLE SENDING END
 
   // ===================================================================================== HANDLE UTILS FUNC START
 
@@ -265,10 +320,6 @@ export default function Home() {
   function fieldModal(selectedPlayer) {
     console.log(selectedPlayer.id)
   }
-
-  // ===================================================================================== HANDLE SENDING START
-
-  // ===================================================================================== HANDLE UTILS FUNC START
 
   function swapArrayElements(arr, indexA, indexB) {
     var temp = arr[indexA]
@@ -506,24 +557,15 @@ export default function Home() {
                 </label>
 
                 <div className="overflow-auto h-[127px]">
-                  <div className="rounded-lg bg-white py-1 px-2 mb-2">
-                    Jalan sendiri +10
-                  </div>
-                  <div className="rounded-lg bg-white py-1 px-2 mb-2">
-                    Target jalan +10
-                  </div>
-                  <div className="rounded-lg bg-white py-1 px-2 mb-2">
-                    Target jalan +10
-                  </div>
-                  <div className="rounded-lg bg-white py-1 px-2 mb-2">
-                    Target jalan +10
-                  </div>
-                  <div className="rounded-lg bg-white py-1 px-2 mb-2">
-                    Target jalan +10
-                  </div>
-                  <div className="rounded-lg bg-white py-1 px-2 mb-2">
-                    Target jalan +10
-                  </div>
+                  {/* {board?.player_map[query.id]?.items.map((item, idx) => ( */}
+                  {myPlayerItems.map((item, idx) => (
+                    <div className="rounded-lg bg-white py-1 px-2 mb-2" key={`item-${item.random_id}`}>
+                      <div className="flex justify-between">
+                        <p>{item.effect_consumable_item.name}</p>
+                        <button className='p-1 border border-black rounded-lg' onClick={()=>handleUseItem(item.random_id)}>use</button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
               <div className="col-span-3 p-1">
@@ -599,7 +641,8 @@ export default function Home() {
       return ""
     }
     if (field_effect.benefit_type === "player_move") {
-      return "bg-red-300 bg-opacity-50"
+      // return "bg-red-300 bg-opacity-50"
+      return ""
     }
     return "bg-green-200 bg-opacity-50"
   }
