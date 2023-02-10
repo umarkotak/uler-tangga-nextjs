@@ -5,6 +5,11 @@ import dynamic from 'next/dynamic'
 import { confetti } from 'dom-confetti'
 import Xarrow from "react-xarrows"
 
+import ulerTanggaApi from "../apis/UlerTanggaApi"
+
+var host = "ws://localhost:6001"
+// var host = "wss://uler-tangga-api.herokuapp.com"
+
 export default function Home() {
   let router = useRouter()
   const query = router.query
@@ -20,6 +25,9 @@ export default function Home() {
   const [parent_8] = useAutoAnimate({duration: 500})
   const [parent_9] = useAutoAnimate({duration: 500})
   const [parent_10] = useAutoAnimate({duration: 500})
+
+  const [showMoveLog, setShowMoveLog] = useState(false)
+  const [moveLogList, setMoveLogList] = useState([])
 
   const fieldHeight = "h-[75px]"
   var baseBoard = {
@@ -44,6 +52,20 @@ export default function Home() {
   const [isWinner, setIsWinner] = useState(false)
 
   var confettiButton
+
+  async function refreshMoveLogList() {
+    try {
+      const response = await ulerTanggaApi.GetRoomMoveLog({room_id: query.room_id})
+      const body = await response.json()
+      if (response.status !== 200) {
+        console.log(body.error_message)
+        return
+      }
+      setMoveLogList(body.data)
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   var onConnecting = false
   useEffect(() => {
@@ -71,8 +93,8 @@ export default function Home() {
       }))
     }
 
-    var socketUrl = `ws://localhost:6001/uler_tangga/start?id=${query.id}&room_id=${query.room_id}`
-    var socketUrl = `wss://uler-tangga-api.herokuapp.com/uler_tangga/start?id=${query.id}&room_id=${query.room_id}`
+    var socketUrl = `${host}/uler_tangga/start?id=${query.id}&room_id=${query.room_id}`
+
     ws.current = new WebSocket(socketUrl)
     ws.current.onopen = () => {
       console.log("CONNECTION OPEN")
@@ -284,12 +306,30 @@ export default function Home() {
 
   return (
     <div className="bg-gradient-to-t from-[#385E72] to-blue-200 h-screen pt-4">
+      <div className={`absolute right-[12px] top-[56px] border bg-white border-black w-[250px] h-[450px] z-10 rounded-lg ${showMoveLog ? "block" : "hidden"}`}>
+        <button className='m-1 p-1 rounded-lg border border-black hover:bg-orange-200' onClick={()=>refreshMoveLogList()}>refresh</button>
+        <div className='p-1 overflow-auto h-[400px]'>
+          <hr/>
+          {moveLogList.map((moveLog, idx) => (
+            <div key={`move-log-${idx}`}>
+              <small>{moveLog.log}</small>
+              <hr/>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="container p-1 mx-auto max-w-[1024px]">
         {Object.values(board.player_room_index_map).map((onePlayer, idx) => (
           <span className="mr-4" key={idx}>
             <i className={`${onePlayer.avatar["icon"]}`}></i>
           </span>
         ))}
+        <div className='relative'>
+          <div className='absolute right-0 top-[-32px]'>
+            <button className='border border-black rounded-lg hover:bg-orange-200 p-1' onClick={()=>setShowMoveLog(!showMoveLog)}>Move Log</button>
+          </div>
+        </div>
       </div>
 
       <div className="container mx-auto max-w-[1024px]">
@@ -404,8 +444,12 @@ export default function Home() {
           <div className="mx-1 rounded">
             <div className="grid grid-cols-10 z-10 gap-0 rounded">
               {board.map_config.numbering.map((number, index) => (
-                <div className={`w-full ${fieldHeight} hover:bg-white p-[0px] hover:bg-opacity-50 rounded target-line-${number}`} id={`target-line-${number}`} key={index}>
-                </div>
+                <div className={`
+                  w-full hover:bg-slate-50 p-[0px] hover:bg-opacity-50 rounded
+                  ${fieldHeight}
+                  target-line-${number}
+                  ${FieldColorDecider(board.map_config.field_effect[number])}
+                `} id={`target-line-${number}`} key={index}></div>
               ))}
             </div>
           </div>
@@ -419,7 +463,7 @@ export default function Home() {
         <div className="bg-gradient-to-t from-blue-300 to-blue-100 block fixed inset-x-0 bottom-0 z-10 border rounded-t-xl h-[185px] p-1 shadow-inner">
           <div className="container mx-auto max-w-[1024px]">
             <div className="fixed bottom-[190px] bg-opacity-90 rounded-lg mt-[-10px] py-1 px-2 bg-gradient-to-t from-blue-300 to-blue-100">
-              {board.active_player.identity.name} jalan : {board.active_player.next_state}
+              Active: <b>{board.active_player.identity.name}</b> | <b>{board.active_player.next_state}</b>
             </div>
 
             <div className="grid grid-cols-10 gap-0 rounded">
@@ -489,7 +533,7 @@ export default function Home() {
                   </div>
 
                   <div className="mb-2">
-                    <div className="flex justify-center bg-white rounded-xl border shadow-inner shadow-lg">
+                    <div className={`flex justify-center bg-white rounded-xl border shadow-inner shadow-lg ${board.active_player.identity.id !== query.id ? "hidden" : "block"}`}>
                       <AnimatedNumbersNoSSR
                         animateToNumber={activeNumber}
                         fontStyle={{fontSize: 40}}
@@ -515,7 +559,7 @@ export default function Home() {
   function ActionButtonDecider(props) {
     if (props.activePlayer.identity.id !== query.id) {
       return(
-        <button className="btn w-full bg-[#ffafcc] border border-black p-2 rounded-lg shadow-lg disabled:bg-slate-50" disabled={true}>
+        <button className="btn w-full bg-[#ffafcc] hover:bg-red-300 border border-black p-2 rounded-lg shadow-lg disabled:bg-slate-50" disabled={true}>
           <span className="text-md">Menunggu</span>
         </button>
       )
@@ -523,7 +567,7 @@ export default function Home() {
 
     if (props.activePlayer.next_state == "rolling_number") {
       return(
-        <button className="btn w-full bg-[#ffafcc] border border-black p-2 rounded-lg shadow-lg" onClick={()=>handleSendRollNumber()}>
+        <button className="btn w-full bg-[#ffafcc] hover:bg-red-300 border border-black p-2 rounded-lg shadow-lg" onClick={()=>handleSendRollNumber()}>
           <span className="text-md">Putar Angka</span>
         </button>
       )
@@ -531,7 +575,7 @@ export default function Home() {
 
     if (props.activePlayer.next_state == "moving") {
       return(
-        <button className="btn w-full bg-[#ffafcc] border border-black p-2 rounded-lg shadow-lg" onClick={()=>handleSendMove()}>
+        <button className="btn w-full bg-[#ffafcc] hover:bg-red-300 border border-black p-2 rounded-lg shadow-lg" onClick={()=>handleSendMove()}>
           <span className="text-md">Jalan</span>
         </button>
       )
@@ -539,7 +583,7 @@ export default function Home() {
 
     if (props.activePlayer.next_state == "end_turn") {
       return(
-        <button className="btn w-full bg-[#ffafcc] border border-black p-2 rounded-lg shadow-lg" onClick={()=>handleSendFinishTurn()}>
+        <button className="btn w-full bg-[#ffafcc] hover:bg-red-300 border border-black p-2 rounded-lg shadow-lg" onClick={()=>handleSendFinishTurn()}>
           <span className="text-md">Selesai</span>
         </button>
       )
@@ -548,5 +592,15 @@ export default function Home() {
     return(
       <div></div>
     )
+  }
+
+  function FieldColorDecider(field_effect) {
+    if (!field_effect) {
+      return ""
+    }
+    if (field_effect.benefit_type === "player_move") {
+      return "bg-red-300 bg-opacity-50"
+    }
+    return "bg-green-200 bg-opacity-50"
   }
 }

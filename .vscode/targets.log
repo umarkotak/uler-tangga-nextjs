@@ -6,8 +6,11 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
+ 
+make: *** No rule to make target `all'.  Stop.
 
-# Make data base, printed on Mon Aug 15 18:57:04 2022
+
+# Make data base, printed on Thu Feb  9 22:44:56 2023
 
 # Variables
 
@@ -28,13 +31,20 @@ LC_CTYPE = UTF-8
 # makefile
 CURDIR := /Users/umar.ramadhana/umar/personal_projects/nextjs/uler-tangga-nextjs
 # makefile
+ 
 SHELL = /bin/sh
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
 # environment
 _ = /usr/bin/make
+# environment
+GIT_INDEX_FILE = .git/index
+# environment
+GIT_AUTHOR_NAME = umar ramadhana
 # makefile (from `Makefile', line 1)
 MAKEFILE_LIST :=  Makefile
+# environment
+GIT_AUTHOR_EMAIL = umar.ramadhana@gojek.com
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
@@ -42,9 +52,17 @@ VSCODE_CWD = /Users/umar.ramadhana/umar/personal_projects/nextjs/uler-tangga-nex
 # environment
 PATH = /Users/umar.ramadhana/Downloads/google-cloud-sdk/bin:/Users/umar.ramadhana/.pyenv/shims:/Users/umar.ramadhana/.rbenv/shims:/Users/umar.ramadhana/.pyenv/bin:/Users/umar.ramadhana/go/bin:/Users/umar.ramadhana/Library/Python/3.8/bin:/Users/umar.ramadhana/usr/local/go/bin/go:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin
 # environment
+GIT_PREFIX = 
+# environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
+LIBRARY_PATH = /usr/local/lib
+# environment
+CPATH = /usr/local/include
+# environment
 GOPATH = /Users/umar.ramadhana/go
+# environment
+LaunchInstanceID = 4FA5DB15-6555-411F-93B3-C72896E3CC3F
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
@@ -52,9 +70,11 @@ PYENV_ROOT = /Users/umar.ramadhana/.pyenv
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.p4ENmtIEKB/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.j8RpAn63fR/Listeners
 # automatic
 %F = $(notdir $%)
+# environment
+SQLITE_EXEMPT_PATH_FROM_VNODE_GUARDS = /Users/umar.ramadhana/Library/WebKit/Databases
 # environment
 PWD = /Users/umar.ramadhana/umar/personal_projects/nextjs/uler-tangga-nextjs
 # environment
@@ -67,16 +87,18 @@ VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 PYENV_SHELL = zsh
 # environment
 HOME = /Users/umar.ramadhana
+# environment
+GIT_EXEC_PATH = /Library/Developer/CommandLineTools/usr/libexec/git-core
 # default
 MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
 # environment
 VSCODE_CLI = 1
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/umar.ramadhana/Library/Application Support/Code/CachedData/6d9b74a70ca9c7733b29f0456fd8195364076dda
+VSCODE_CODE_CACHE_PATH = /Users/umar.ramadhana/Library/Application Support/Code/CachedData/97dec172d3256f8ca4bfb2143f3f76b503ca0534
 # environment
 LOGNAME = umar.ramadhana
 # environment
-APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
 # environment
 ZSH = /Users/umar.ramadhana/.oh-my-zsh
 # environment
@@ -102,7 +124,7 @@ USER = umar.ramadhana
 # default
 MAKECMDGOALS := all
 # environment
-TERM_SESSION_ID = w0t4p1:B5BE6F53-E57D-424D-80B8-DAE3628CD42B
+TERM_SESSION_ID = w0t0p1:E3D304E3-3AD4-4651-B99E-9FC0D84B9A0C
 # environment
 LESS = -R
 # automatic
@@ -118,7 +140,7 @@ TMPDIR = /var/folders/ks/wb5pp8w95rz99jc1g1m6g1_80000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/umar.ramadhana/Library/Application Support/Code/1.70.1-main.sock
+VSCODE_IPC_HOOK = /Users/umar.ramadhana/Library/Application Support/Code/1.74.3-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -128,17 +150,17 @@ MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
-TERM_PROGRAM_VERSION = 3.4.16
+TERM_PROGRAM_VERSION = 3.4.19
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.17936077.17936083.DB35E5AA-C3BB-4D94-9107-E48A3F07F288
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.40863586.40863592.92E300D5-422F-467A-8CC0-9AB8EE3BE7D7
 # environment
-LC_TERMINAL_VERSION = 3.4.16
+LC_TERMINAL_VERSION = 3.4.19
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # automatic
 +F = $(notdir $+)
 # environment
-ITERM_SESSION_ID = w0t4p1:B5BE6F53-E57D-424D-80B8-DAE3628CD42B
+ITERM_SESSION_ID = w0t0p1:E3D304E3-3AD4-4651-B99E-9FC0D84B9A0C
 # environment
 COLORFGBG = 7;0
 # environment
@@ -152,6 +174,8 @@ RBENV_SHELL = zsh
 # automatic
 <F = $(notdir $<)
 # environment
+GIT_AUTHOR_DATE = @1675836531 +0700
+# environment
 ITERM_PROFILE = Default
 # environment
 GOPRIVATE = source.golabs.io
@@ -159,10 +183,14 @@ GOPRIVATE = source.golabs.io
 PAGER = less
 # environment
 LC_ALL = C
+# environment
+SECURITYSESSIONID = 186a3
 # automatic
 ^F = $(notdir $^)
 # default
 SUFFIXES := 
+# environment
+SDKROOT = /Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk
 # default
 .INCLUDE_DIRS = /usr/local/include
 # environment
@@ -172,13 +200,14 @@ LANG = C
 # environment
 TERM = xterm-256color
 # environment
-VSCODE_PID = 48472
+VSCODE_PID = 99021
 # variable set hash-table stats:
-# Load=81/1024=8%, Rehash=0, Collisions=5/105=5%
+# Load=93/1024=9%, Rehash=0, Collisions=5/117=4%
 
 # Pattern-specific Variable Values
 
 # No pattern-specific variable values.
+ 
 
 # Directories
 
@@ -243,8 +272,6 @@ run:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Mon Aug 15 18:57:04 2022
+# Finished Make data base on Thu Feb  9 22:44:56 2023
 
  
-make: *** No rule to make target `all'.  Stop.
-
