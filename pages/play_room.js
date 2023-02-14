@@ -260,12 +260,16 @@ export default function Home() {
 
     setBoard({...baseBoard, player_room_index_map: tempBoard.player_room_index_map})
 
+    setBoard({...baseBoard, active_player: data.player})
+
     if (moveData.winner !== "") {
       setIsWinner(true)
       confettiButton.click()
     }
 
-    setMyPlayerItems(data.player_items)
+    if (data.player.identity.id === query.id) {
+      setMyPlayerItems(data.player.items)
+    }
   }
 
   // ===================================================================================== HANDLE INCOMING END
@@ -415,7 +419,7 @@ export default function Home() {
       <div className="container p-1 mx-auto max-w-[1024px]">
         {Object.values(board.player_room_index_map).map((onePlayer, idx) => (
           <span className="mr-4" key={idx}>
-            <i className={`${onePlayer.avatar["icon"]}`}></i>
+            <i className={`${onePlayer.avatar["icon"]}`}></i>{onePlayer.identity.id}
           </span>
         ))}
         <div className='relative'>
