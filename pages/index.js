@@ -37,12 +37,13 @@ export default function Home() {
 
         <div className="grid sm:grid-cols-1 md:grid-cols-2">
           <div className="p-1">
-            <div className="mt-4 backdrop-blur-sm bg-white bg-opacity-50 p-4 drop-shadow-lg rounded-xl text-center h-[450px]">
+            <div className="mt-4 backdrop-blur-sm bg-white bg-opacity-50 p-4 drop-shadow-lg rounded-xl text-center h-[480px]">
               <div className="mb-4 text-left">
                 <label className="block text-gray-700 text-sm font-bold mb-2">
                   Username *
                 </label>
                 <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"  placeholder="jhonedoe" value={userId} onChange={(e) => {setUserId(e.target.value)}} />
+                <small>this is a MUST, if you forget to set the username it will break the server</small>
               </div>
               <div className="mb-4 text-left">
                 <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -70,7 +71,12 @@ export default function Home() {
                 <a className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="#">
                   Need help?
                 </a>
-                <a href={`/play_room?id=${userId}&room_id=${roomId}`} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Join Game</a>
+                <a
+                  href={(roomId && userId) ? `/play_room?id=${userId}&room_id=${roomId}` : "#"}
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                >
+                  Join Games
+                </a>
               </div>
 
               <div className="mt-8 text-sm">
@@ -82,7 +88,7 @@ export default function Home() {
           </div>
 
           <div className="p-1">
-            <div className="mt-4 backdrop-blur-sm w-full bg-white bg-opacity-50 p-4 drop-shadow-lg rounded-xl text-center h-[450px]">
+            <div className="mt-4 backdrop-blur-sm w-full bg-white bg-opacity-50 p-4 drop-shadow-lg rounded-xl text-center h-[480px]">
               <div className="mb-4 text-left text-lg">
                 <b>Room List</b>
               </div>

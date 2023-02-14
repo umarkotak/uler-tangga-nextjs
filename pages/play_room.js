@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
 import { confetti } from 'dom-confetti'
 import Xarrow from "react-xarrows"
+import { useAlert } from 'react-alert'
 
 import ulerTanggaApi from "../apis/UlerTanggaApi"
 
@@ -11,6 +12,7 @@ var host = "ws://localhost:12000"
 var host = "wss://uler-tangga-api.animapu.site"
 
 export default function Home() {
+  const alert = useAlert()
   let router = useRouter()
   const query = router.query
   const ws = useRef(null)
@@ -25,9 +27,6 @@ export default function Home() {
   const [parent_8] = useAutoAnimate({duration: 500})
   const [parent_9] = useAutoAnimate({duration: 500})
   const [parent_10] = useAutoAnimate({duration: 500})
-
-  const [showMoveLog, setShowMoveLog] = useState(false)
-  const [moveLogList, setMoveLogList] = useState([])
 
   const fieldHeight = "h-[75px]"
   var baseBoard = {
@@ -47,10 +46,18 @@ export default function Home() {
       identity: {}
     }
   }
+
+  const [showMoveLog, setShowMoveLog] = useState(false)
+  const [showItemDetailModal, setShowItemDetailModal] = useState(false)
+  const [moveLogList, setMoveLogList] = useState([])
   const [board, setBoard] = useState(baseBoard)
   const [activeNumber, setActiveNumber] = useState(1)
   const [isWinner, setIsWinner] = useState(false)
   const [myPlayerItems, setMyPlayerItems] = useState([])
+  const [myPlayerData, setMyPlayerData] = useState({})
+  const [selectedItem, setSelectedItem] = useState({})
+  const [selectedTargetIdentity, setSelectedTargetIdentity] = useState({})
+  var selectedItemID = ""
 
   var confettiButton
 
@@ -152,6 +159,8 @@ export default function Home() {
       handleKindRoomData(response.data)
     } else if (response.response_kind === "player_used_item") {
       handleKindPlayerUsedItem(response.data)
+    } else if (response.response_kind === "process_error") {
+      alert.error(`${response.server_error.code} || ${response.server_error.message}`)
     } else {
       console.error("INVALID RESPONSE KIND", response)
     }
@@ -187,11 +196,6 @@ export default function Home() {
 
     setBoard({...baseBoard, player_room_index_map: tempBoard.player_room_index_map})
 
-    if (tempBoard.player_room_index_map[playerIndex].index_position >= (tempBoard.map_config.size - 1)) {
-      setIsWinner(true)
-      confettiButton.click()
-    }
-
     setBoard({...baseBoard, active_player: data.player})
   }
 
@@ -214,7 +218,7 @@ export default function Home() {
 
     setBoard({...baseBoard, player_room_index_map: tempBoard.player_room_index_map})
 
-    if (tempBoard.player_room_index_map[playerIndex].index_position >= (tempBoard.map_config.size - 1)) {
+    if (data.winner !== "") {
       setIsWinner(true)
       confettiButton.click()
     }
@@ -256,10 +260,12 @@ export default function Home() {
 
     setBoard({...baseBoard, player_room_index_map: tempBoard.player_room_index_map})
 
-    if (tempBoard.player_room_index_map[playerIndex].index_position >= (tempBoard.map_config.size - 1)) {
+    if (moveData.winner !== "") {
       setIsWinner(true)
       confettiButton.click()
     }
+
+    setMyPlayerItems(data.player_items)
   }
 
   // ===================================================================================== HANDLE INCOMING END
@@ -298,16 +304,27 @@ export default function Home() {
     ws.current.send(JSON.stringify(wsPayload))
   }
 
-  function handleUseItem(item_id) {
+  function handleSelectItem(item_id, item) {
+    setShowItemDetailModal(true)
+    item.temp_id = item_id
+    setSelectedItem(item)
+  }
+
+  function handleUseItem() {
+    setShowItemDetailModal(false)
     var wsPayload = {
       "action": "player_use_item",
       "payload": {
-        "item_random_id": item_id
+        "item_random_id": `${selectedItem.temp_id}`,
+        "item_target_user_id": selectedTargetIdentity.id,
       }
     }
     ws.current.send(JSON.stringify(wsPayload))
   }
 
+  function handleSelectField(field_effect) {
+    console.log(field_effect)
+  }
 
   // ===================================================================================== HANDLE SENDING END
 
@@ -357,7 +374,8 @@ export default function Home() {
 
   return (
     <div className="bg-gradient-to-t from-[#385E72] to-blue-200 h-screen pt-4">
-      <div className={`absolute right-[12px] top-[56px] border bg-white border-black w-[250px] h-[450px] z-10 rounded-lg ${showMoveLog ? "block" : "hidden"}`}>
+      {/* MOVE LOG */}
+      <div className={`absolute right-[12px] top-[56px] border bg-white border-black w-[260px] h-[450px] z-10 rounded-lg ${showMoveLog ? "block" : "hidden"}`}>
         <button className='m-1 p-1 rounded-lg border border-black hover:bg-orange-200' onClick={()=>refreshMoveLogList()}>refresh</button>
         <div className='p-1 overflow-auto h-[400px]'>
           <hr/>
@@ -368,6 +386,30 @@ export default function Home() {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className={`absolute overflow-auto right-[24px] top-[56px] border bg-white border-black w-[260px] h-[450px] z-20 rounded-lg ${showItemDetailModal ? "block" : "hidden"}`}>
+        <span className='p-1'>=== ITEM WINDOW ===</span>
+        <button className='m-1 p-1 rounded-lg border border-black hover:bg-orange-200' onClick={()=>setShowItemDetailModal(false)}>close</button>
+        <hr/>
+        <div className='p-1'>
+          <p><b>Nama Item:</b> {selectedItem.name}</p>
+          <p><b>Deskripsi:</b> {selectedItem.effect_type}</p>
+        </div>
+        <hr/>
+        <div className='p-1'>
+          select target player:
+          {Object.values(board.player_room_index_map).map((onePlayer, idx) => (
+            <div className="p-1" key={idx}>
+              {`${onePlayer.identity["id"]}`}
+              <button className='m-1 p-1 rounded-lg border border-black hover:bg-orange-200' onClick={()=>setSelectedTargetIdentity(onePlayer.identity)}>select</button>
+            </div>
+          ))}
+        </div>
+        <hr/>
+        <span className='p-1'><b>Target:</b> {selectedTargetIdentity.id}</span>
+        <hr/>
+        <button className='m-1 p-1 rounded-lg border border-black hover:bg-orange-200' onClick={()=>handleUseItem()}>use</button>
       </div>
 
       <div className="container p-1 mx-auto max-w-[1024px]">
@@ -500,7 +542,7 @@ export default function Home() {
                   ${fieldHeight}
                   target-line-${number}
                   ${FieldColorDecider(board.map_config.field_effect[number])}
-                `} id={`target-line-${number}`} key={index}></div>
+                `} id={`target-line-${number}`} key={index} onClick={()=>handleSelectField(board.map_config.field_effect[number])}></div>
               ))}
             </div>
           </div>
@@ -562,7 +604,7 @@ export default function Home() {
                     <div className="rounded-lg bg-white py-1 px-2 mb-2" key={`item-${item.random_id}`}>
                       <div className="flex justify-between">
                         <p>{item.effect_consumable_item.name}</p>
-                        <button className='p-1 border border-black rounded-lg' onClick={()=>handleUseItem(item.random_id)}>use</button>
+                        <button className='p-1 border border-black rounded-lg' onClick={()=>handleSelectItem(item.random_id, item.effect_consumable_item)}>use</button>
                       </div>
                     </div>
                   ))}
